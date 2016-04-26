@@ -62,6 +62,10 @@ variable "instance_type" {}
 variable "key_name" {
   description = "The SSH public key name (in EC2 key-pairs) to be injected into instances"
 }
+variable "user_data" {
+  description = "The path to a file with user_data for the instances"
+}
+
 #
 # Auto-Scaling Group
 #

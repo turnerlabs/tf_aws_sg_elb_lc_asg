@@ -22,6 +22,9 @@ variable "elb_health_check_target" {
 variable "lc_name" {
   default = "mylc"
 }
+variable "user_data_file" {
+  default = "user-data.sh"
+}
 variable "ami_id" {
   default = "ami-fce3c696"
 }
@@ -53,5 +56,5 @@ variable "vpc_zone_subnets" {
   default = "subnet-70ed015b,subnet-dd64c6aa"
 }
 variable "instance_name" {
-  default = "myinstance"  
+  default = "myinstance"
 }

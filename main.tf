@@ -80,6 +80,7 @@ resource "aws_launch_configuration" "launch_config" {
   instance_type = "${var.instance_type}"
   key_name = "${var.key_name}"
   security_groups = ["${aws_security_group.sg_instance.id}"]
+  user_data = "${file(var.user_data)}"
 }
 
 resource "aws_autoscaling_group" "main_asg" {
