@@ -105,4 +105,9 @@ resource "aws_autoscaling_group" "main_asg" {
   load_balancers = ["${var.elb_name}"]
 
   termination_policies = ["${split(",", var.termination_policy)}"]
+
+  tag {
+    name = ["${var.instance_name}"]
+    propagate_at_launch = true
+  }
 }

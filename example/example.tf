@@ -9,6 +9,10 @@ module "my_autoscaling_group" {
 
   elb_name = "${var.elb_name}"
 
+  elb_listener_lb_port = "${var.elb_listener_lb_port}"
+  elb_listener_instance_port = "${var.elb_listener_instance_port}"
+  elb_health_check_target = "${var.elb_health_check_target}"
+
   lc_name = "${var.lc_name}"
 
   ami_id = "${var.ami_id}"
@@ -25,4 +29,5 @@ module "my_autoscaling_group" {
 
   availability_zones = "${var.availability_zones}"
   vpc_zone_subnets = "${var.vpc_zone_subnets}"
+  instance_name = "${var.instance_name}"
 }

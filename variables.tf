@@ -66,7 +66,7 @@ variable "key_name" {
 # Auto-Scaling Group
 #
 variable "asg_name" {
-  description = "The name used for the auto scale group"  
+  description = "The name used for the auto scale group"
 }
 
 /* We use this to populate the following ASG settings
@@ -123,4 +123,8 @@ variable "vpc_zone_subnets" {
 variable "termination_policy" {
   description = "A comma separated list of termination policy(ies) used to terminate instances"
   default = "OldestLaunchConfiguration,OldestInstance"
+}
+
+variable "instance_name" {
+  description = "Name to be applied to launched instances"
 }
