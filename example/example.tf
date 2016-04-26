@@ -1,5 +1,5 @@
 module "my_autoscaling_group" {
-  source = "github.com/smithatlanta/tf_aws_sg_elb_lc_asg"
+  source = "github.com/turnerlabs/tf_aws_sg_elb_lc_asg"
 
   sg_elb_name = "${var.sg_elb_name}"
   sg_instance_name = "${var.sg_instance_name}"
