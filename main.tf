@@ -82,7 +82,7 @@ resource "aws_launch_configuration" "launch_config" {
 
 resource "aws_autoscaling_group" "main_asg" {
   # We want this to explicitly depend on the launch config above
-  depends_on = ["aws_launch_configuration.launch_config"]
+  depends_on = ["aws_launch_configuration.launch_config", "aws_elb.elb"]
 
   name = "${var.asg_name}"
 

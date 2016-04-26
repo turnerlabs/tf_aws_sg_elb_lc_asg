@@ -1,17 +1,17 @@
 variable "sg_elb_name" {
-  default = "sg_el"
+  default = "sgelb"
 }
 variable "sg_instance_name" {
-  default = "sg_ins"
+  default = "sginstance"
 }
 variable "vpc_id" {
   default = "vpc-32109d57"
 }
 variable "elb_name" {
-  default = "my_elb"
+  default = "myelb"
 }
 variable "lc_name" {
-  default = "example_lc"
+  default = "examplelc"
 }
 variable "ami_id" {
   default = "ami-fce3c696"
