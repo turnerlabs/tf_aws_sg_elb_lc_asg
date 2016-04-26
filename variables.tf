@@ -67,10 +67,6 @@ variable "health_check_type" {
   default = "ELB"
 }
 
-variable "load_balancer_names" {
-  description = "A comma seperated list string of ELB names the ASG should associate instances with"
-}
-
 /*
  * A string list of AZs, ex:
  * "us-east-1a,us-east-1c,us-east-1e"
