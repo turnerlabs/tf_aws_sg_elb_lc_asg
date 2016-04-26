@@ -31,9 +31,6 @@ variable "instance_type" {}
 variable "key_name" {
   description = "The SSH public key name (in EC2 key-pairs) to be injected into instances"
 }
-variable "security_group" {
-  description = "ID of SG the launched instance will use"
-}
 #
 # Auto-Scaling Group
 #
