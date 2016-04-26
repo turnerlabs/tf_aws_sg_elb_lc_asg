@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "hi, mom." > ~/mom.txt
+echo "Thanks Brandon!" > ~/root.txt

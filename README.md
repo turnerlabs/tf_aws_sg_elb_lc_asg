@@ -1,60 +1,90 @@
-tf_aws_asg_elb
+tf_aws_elb_sg_lc_asg
 ==============
-A Terraform module for creating an Auto-Scaling Group and a launch
-configuration for it, for use with an Elastic Load Balancer.
+
+This is an expanded upon version of https://github.com/terraform-community-modules/tf_aws_asg_elb
+
+This is a Terraform module for creating 2 Security Groups(ELB and Instance), an ELB, a Launch Configuration, and an Auto-Scaling Group.
 This module makes the following assumptions:
-* You have subnets in a VPC and that you want your instances
-   in two subnets (in two AZs)
+* You have a VPC that you want your instances to run in
 * You can fully bootstrap your instances using an AMI + user_data
 * *You want to associate the ASG with an ELB*
-* Your instances behind the ELB will be in a VPC
-* Your using a single Security Group for all instances in the ASG
+* You're instances behind the ELB will be in a VPC
+* You're using a Security Group for the ELB and a Security Group for all instances in the ASG
 
 Input Variables
 ---------------
 
-- `lc_name` - The launch configuration name
-- `ami_id`
-- `instance_type`
-- `iam_instance_profile` - The ARN of the Instance Profile the LC should
-   launch instances with.
-   E.g. arn:aws:iam::XXXXXXXXXXXX:instance-profile/my-instance-profile
-- `key_name` - The SSH key name (uploaded to EC2) instances should
-   be populated with.
-- `security_group` - The Security Group ID that instances in the ASG
-    - This is usually set to resolve to a security group you make in the
-      same template as this module, e.g. "${module.sg_web.security_group_id_web}"
-    - It needs to be customized based on the name of your module resource.
-   should use.
-- `user_data` - The path to the user_data file for the Launch Configuration.
-    - Terraform will include the contents of this file in the Launch Configuration.
+ Security Group
+
+- `sg_elb_name` - The name used for the security group applied to the load balancer
+
+- `sg_instance_name` - The name used for the security group applied to all the provisioned instances
+
+- `vpc_id` - The VPC id that all the infrastructure is applied to
+
+
+ ELB
+
+- `elb_name` - The name used for the load balancer.
+
+- `elb_listener_lb_port` - The port the ELB will listen to incoming traffic on.
+
+- `elb_listener_instance_port` - The port the ELB will forward traffic to.
+
+- `elb_health_check_healthy_threshold` - The number of checks before the instance is declared healthy.  `The default is 10.`
+
+- `elb_health_check_unhealthy_threshold` - The number of checks before the instance is declared unhealthy.  `The default is 2.`
+
+- `elb_health_check_timeout` - The length of time before the check times out.  `The default is 5.`
+
+- `elb_health_check_target` - The target of the heath check. `ex. HTTP:80/healthcheck`
+
+- `elb_health_check_interval` - The interval between health checks. `The default is 30.`
+
+
+
+ Launch Configuration
+
+- `lc_name` - The launch configuration name.
+
+- `ami_id` - The AMI to use with the launch configuration.
+
+- `instance_type` - The instance type.  `ex. t2.small, m1.medium`
+
+- `key_name` - The SSH key name (uploaded to EC2) instances should be populated with.
+
+- `user_data` - The path to the user_data file for the Launch Configuration.  Terraform will include the contents of this file in the Launch Configuration.
+
+
+ Auto Scale Groups
+
 - `asg_name` - The Auto-Scaling group name.
-- `asg_number_of_instances` - The number of instances we want in the ASG
-    - This is used to populate the following ASG settings.
-    - max_size
-    - desired_capacity
+
+- `asg_number_of_instances` - The number of instances we want in the ASG.  `This is used to populate max_size and desired_capacity.`
+
 - `asg_minimum_number_of_instances` - The minimum number of instances
-   the ASG should maintain.
-    - This is used for min_size
-    - It defaults to 1
-    - You can set it to 0 if you want the ASG to do nothing when an
-      instances fails
+   the ASG should maintain.  `This is used to populate min_size.  You can set it to 0 if you want the ASG to do nothing when an instances fails.  The default is 1.`
+
 - `health_check_grace_period` - Number of seconds for the health check
-   time out. Defaults to 300.
+   time out. `The defaults is 300.``
+
 - `health_check_type` - The health check type. Options are `ELB` and
-   `EC2`. It defaults to `ELB` in this module.
-- `load_balancer_names` - The name(s) of the ELB(s) to associate with the ASG,
-   for settings it's backend instances. Ideally this is a reference to
-   an ELB you're making in the same template as this ASG. Can be a CSV of ELB names
-   if more than one is desired.
-- `availability_zones` - CSV of availability zones (AZs) for the ASG. *ex. "us-east-1a,us-east-1c"*
-- `vpc_zone_subnets` - CSV of VPC subnets to associate with ASG. There should be one subnet
-   for each of the `availability_zones.` *ex. "subnet-d2gd22,subnet-2kjn8qq"*
+   `EC2`. `The default is ELB.`
+
+- `availability_zones` - A comma separated list of availability zones (AZs) for the ASG. `ex. "us-east-1a,us-east-1c"`
+
+- `vpc_zone_subnets` - A comma seperated list of VPC subnets to associate with ASG, should correspond with var.availability_zones zones.  `ex. "subnet-d2t4sad,subnet-434ladkn"`
+
+- `termination_policy` - A comma separated list of termination policies used to terminate instances.  `The default is "OldestLaunchConfiguration,OldestInstance"`
+
+- `instance_name` - The name to be applied to the launched instances
+
 
 Outputs
 -------
 
 - `launch_config_id`
+
 - `asg_id`
 
 Usage
@@ -66,37 +96,30 @@ You can use these in your terraform template with the following steps.
 
 ```
 module "my_autoscaling_group" {
-  source = "github.com/terraform-community-modules/tf_aws_asg_elb"
+  source = "github.com/smithatlanta/tf_aws_sg_elb_lc_asg"
+
+  sg_elb_name = "${var.sg_elb_name}"
+  sg_instance_name = "${var.sg_instance_name}"
+  vpc_id = "${var.vpc_id}"
+
+  elb_name = "${var.elb_name}"
+  elb_listener_lb_port = "${var.elb_listener_lb_port}"
+  elb_listener_instance_port = "${var.elb_listener_instance_port}"
+  elb_health_check_target = "${var.elb_health_check_target}"
+
   lc_name = "${var.lc_name}"
+  user_data = "${var.user_data_file}"
   ami_id = "${var.ami_id}"
   instance_type = "${var.instance_type}"
-  iam_instance_profile = "${var.iam_instance_profile}"
   key_name = "${var.key_name}"
 
-  //Using a reference to an SG we create in the same template.
-  // - It needs to be customized based on the name of your module resource
-  // - It is recommended that you use https://github.com/terraform-community-modules/tf_aws_sg/tree/master/sg_https_only
-  //   for the SG
-  security_group = "${module.sg_https_only.security_group_id_web}"
-
-  user_data = "${var.user_data}"
   asg_name = "${var.asg_name}"
   asg_number_of_instances = "${var.asg_number_of_instances}"
-  asg_minimum_number_of_instancs = "${var.asg_minimum_number_of_instances}"
-
-  //Using a reference to an SG we create in the same template
-  load_balancer_names = "${module.my_elb.elb_name}"
-
-  // The health_check_type can be EC2 or ELB and defaults to ELB
-  health_check_type = "${var.health_check_type}"
-
   availability_zones = "${var.availability_zones}"
   vpc_zone_subnets = "${var.vpc_zone_subnets}"
-
-  aws_access_key = "${var.aws_access_key}"
-  aws_secret_key = "${var.aws_secret_key}"
-  aws_region = "${var.aws_region}"
+  instance_name = "${var.instance_name}"
 }
+
 ```
 
 2.) Setting values for the following variables, either through `terraform.tfvars` or `-var` arguments on the CLI
@@ -104,23 +127,28 @@ module "my_autoscaling_group" {
 - aws_access_key
 - aws_secret_key
 - aws_region
+- sg_elb_name
+- sg_instance_name
+- vpc_id
+- elb_name
+- elb_listener_lb_port
+- elb_listener_instance_port
+- elb_health_check_target
 - lc_name
+- user_data
 - ami_id
 - instance_type
-- iam_instance_profile
 - key_name
-- security_group
-- user_data
 - asg_name
-- asg_number_of_instances.
-- load_balancer_names
+- asg_number_of_instances
 - availability_zones
 - vpc_zone_subnets
+- instance_name
 
 Authors
 =======
 
-Created and maintained by [Brandon Burton](https://github.com/solarce) (brandon@inatree.org).
+Created and maintained by [Michael Smith](https://github.com/smithatlanta) (smithatlanta@gmail.com).
 
 License
 =======

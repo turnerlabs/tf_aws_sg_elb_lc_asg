@@ -58,12 +58,14 @@ variable "lc_name" {
 variable "ami_id" {
   description = "The AMI to use with the launch configuration"
 }
-variable "instance_type" {}
+variable "instance_type" {
+  description = "The instance type.  ex. t2.small, m1.medium, etc."
+}
 variable "key_name" {
   description = "The SSH public key name (in EC2 key-pairs) to be injected into instances"
 }
 variable "user_data" {
-  description = "The path to a file with user_data for the instances"
+  description = "The path to a file with the user_data for the instances"
 }
 
 #
