@@ -6,24 +6,55 @@
  # Security Group Variables
  #
 
-variable "sg_elb_name" {}
-variable "sg_instance_name" {}
-
-variable "vpc_id" {
-  description = "The VPC id to use"
+variable "sg_elb_name" {
+  description = "The name used for the security group applied to the load balancer"
 }
-
+variable "sg_instance_name" {
+  description = "The name used for the security group applied to all the provisioned instances"
+}
+variable "vpc_id" {
+  description = "The VPC id that all the infrastructure is applied to"
+}
 
 #
 # ELB Variables
 #
 
-variable "elb_name" {}
+variable "elb_name" {
+  description = "The name used for the load balancer"
+}
+variable "elb_listener_lb_port" {
+  description = "The port the ELB will listen to incoming traffic on"
+}
+variable "elb_listener_instance_port" {
+  description = "The port the elb will forward traffic to"
+}
+variable "elb_health_check_healthy_threshold" {
+  description = "The number of checks before the instance is declared healthy"
+  default = "10"
+}
+variable "elb_health_check_unhealthy_threshold" {
+  description = "The number of checks before the instance is declared unhealthy"
+  default = "2"
+}
+variable "elb_health_check_timeout" {
+  description = "The length of time before the check times out"
+  default = "5"
+}
+variable "elb_health_check_target" {
+  description = "The target of the heath check. usually something like HTTP:<instance_port>/healthcheck"
+}
+variable "elb_health_check_interval" {
+  description = "The interval between health checks"
+  default = "30"
+}
 
 #
 # Launch Configuration Variables
 #
-variable "lc_name" {}
+variable "lc_name" {
+  description = "The name used for the launch configuration"
+}
 variable "ami_id" {
   description = "The AMI to use with the launch configuration"
 }
@@ -34,7 +65,9 @@ variable "key_name" {
 #
 # Auto-Scaling Group
 #
-variable "asg_name" {}
+variable "asg_name" {
+  description = "The name used for the auto scale group"  
+}
 
 /* We use this to populate the following ASG settings
  * - max_size
@@ -81,4 +114,13 @@ variable "availability_zones" {
  */
 variable "vpc_zone_subnets" {
   description = "A comma seperated list string of VPC subnets to associate with ASG, should correspond with var.availability_zones zones"
+}
+
+/*
+ * A string list of termination policiess, ex:
+ * "OldestLaunchConfiguration,OldestInstance"
+ */
+variable "termination_policy" {
+  description = "A comma separated list of termination policy(ies) used to terminate instances"
+  default = "OldestLaunchConfiguration,OldestInstance"
 }

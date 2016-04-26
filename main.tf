@@ -17,16 +17,16 @@ resource "aws_security_group" "sg_elb" {
 
   # inbound HTTP access from anywhere
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = "${var.elb_listener_lb_port}"
+    to_port     = "${var.elb_listener_lb_port}"
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   # outbound only to items with the sg_instance security group
   egress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = "${var.elb_listener_instance_port}"
+    to_port     = "${var.elb_listener_instance_port}"
     protocol    = "tcp"
     security_groups = ["${aws_security_group.sg_instance.id}"]
   }
@@ -53,26 +53,28 @@ resource "aws_security_group" "sg_instance" {
  }
 
 resource "aws_elb" "elb" {
-  name             = "${var.elb_name}"
-  availability_zones = ["${split(",", var.availability_zones)}"]
-  security_groups  = ["${aws_security_group.sg_elb.id}"]
+  depends_on          = ["aws_security_group.sg_elb"]
+  name                = "${var.elb_name}"
+  availability_zones  = ["${split(",", var.availability_zones)}"]
+  security_groups     = ["${aws_security_group.sg_elb.id}"]
 
   listener {
-    instance_port     = 80
+    instance_port     = "${var.elb_listener_instance_port}"
     instance_protocol = "http"
-    lb_port           = 80
+    lb_port           = "${var.elb_listener_lb_port}"
     lb_protocol       = "http"
   }
   health_check {
-    healthy_threshold = 2
-    unhealthy_threshold = 2
-    timeout = 3
-    target = "HTTP:80/healthcheck"
-    interval = 20
+    healthy_threshold = "${var.elb_health_check_healthy_threshold}"
+    unhealthy_threshold = "${var.elb_health_check_unhealthy_threshold}"
+    timeout = "${var.elb_health_check_timeout}"
+    target = "${var.elb_health_check_target}"
+    interval = "${var.elb_health_check_interval}"
   }
 }
 
 resource "aws_launch_configuration" "launch_config" {
+  depends_on = ["aws_security_group.sg_instance"]
   name = "${var.lc_name}"
   image_id = "${var.ami_id}"
   instance_type = "${var.instance_type}"
@@ -101,4 +103,6 @@ resource "aws_autoscaling_group" "main_asg" {
   health_check_type = "${var.health_check_type}"
 
   load_balancers = ["${var.elb_name}"]
+
+  termination_policies = ["${split(",", var.termination_policy)}"]
 }
