@@ -107,7 +107,8 @@ resource "aws_autoscaling_group" "main_asg" {
   termination_policies = ["${split(",", var.termination_policy)}"]
 
   tag {
-    name = ["${var.instance_name}"]
+    key = "name"
+    value = "${var.instance_name}"
     propagate_at_launch = true
   }
 }
