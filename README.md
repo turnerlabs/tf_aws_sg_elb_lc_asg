@@ -148,6 +148,7 @@ module "my_autoscaling_group" {
 Authors
 =======
 
+Forked from https://github.com/terraform-community-modules/tf_aws_asg_elb
 Created and maintained by [Michael Smith](https://github.com/smithatlanta) (smithatlanta@gmail.com).
 
 License
