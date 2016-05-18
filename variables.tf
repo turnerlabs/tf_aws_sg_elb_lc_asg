@@ -48,6 +48,10 @@ variable "elb_health_check_interval" {
   description = "The interval between health checks"
   default = "30"
 }
+variable "elb_internal_bool" {
+  description = "If the ELB is going to be internal or not"
+  default = "true"
+}
 
 #
 # Launch Configuration Variables
@@ -66,6 +70,10 @@ variable "key_name" {
 }
 variable "user_data" {
   description = "The path to a file with the user_data for the instances"
+}
+variable "associate_public_ip_address" {
+  description = "This allows an instance to be externally accessible"
+  default = false
 }
 
 #

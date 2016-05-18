@@ -33,8 +33,8 @@ resource "aws_security_group" "sg_elb" {
  }
 
 resource "aws_security_group" "sg_instance" {
-  name          = "${var.sg_instance_name}"
-  vpc_id        = "${var.vpc_id}"
+  name                        = "${var.sg_instance_name}"
+  vpc_id                      = "${var.vpc_id}"
 
   # SSH access from anywhere
   ingress {
@@ -57,6 +57,7 @@ resource "aws_elb" "elb" {
   name                = "${var.elb_name}"
   availability_zones  = ["${split(",", var.availability_zones)}"]
   security_groups     = ["${aws_security_group.sg_elb.id}"]
+  internal            = "${var.elb_internal_bool}"
 
   listener {
     instance_port     = "${var.elb_listener_instance_port}"
@@ -81,6 +82,7 @@ resource "aws_launch_configuration" "launch_config" {
   key_name = "${var.key_name}"
   security_groups = ["${aws_security_group.sg_instance.id}"]
   user_data = "${file(var.user_data)}"
+  associate_public_ip_address = "${var.associate_public_ip_address}"
 }
 
 resource "aws_autoscaling_group" "main_asg" {
